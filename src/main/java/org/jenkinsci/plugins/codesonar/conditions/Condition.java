@@ -40,4 +40,8 @@ public abstract class Condition implements Describable<Condition>, ExtensionPoin
 
         throw new NullPointerException("Jenkins is not started or is stopped");
     }
+
+    public String describeResult() {
+        return getDescriptor().getDisplayName();
+    }
 }

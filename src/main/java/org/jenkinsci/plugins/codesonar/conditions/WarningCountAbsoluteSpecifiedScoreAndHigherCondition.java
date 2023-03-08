@@ -30,6 +30,7 @@ public class WarningCountAbsoluteSpecifiedScoreAndHigherCondition extends Condit
     private int rankOfWarnings = 30;
     private int warningCountThreshold = 20;
     private String warrantedResult = Result.UNSTABLE.toString();
+    private String resultDescription = NAME;
 
     @DataBoundConstructor
     public WarningCountAbsoluteSpecifiedScoreAndHigherCondition(int rankOfWarnings, int warningCountThreshold) {
@@ -80,10 +81,17 @@ public class WarningCountAbsoluteSpecifiedScoreAndHigherCondition extends Condit
         }
 
         if (severeWarnings > warningCountThreshold) {
+            resultDescription = String.format("More than %d warnings with a score of at least %d (%d)", warningCountThreshold, rankOfWarnings, severeWarnings);
             return Result.fromString(warrantedResult);
         }
 
+        resultDescription = String.format("At most %d warnings with a score of at least %d (%d)", warningCountThreshold, rankOfWarnings, severeWarnings);
         return Result.SUCCESS;
+    }
+
+    @Override
+    public String describeResult() {
+        return resultDescription;
     }
 
     @Symbol("warningCountAbsoluteSpecifiedScoreAndHigher")

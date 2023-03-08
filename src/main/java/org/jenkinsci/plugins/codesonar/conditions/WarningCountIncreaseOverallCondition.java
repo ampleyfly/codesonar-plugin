@@ -22,6 +22,7 @@ public class WarningCountIncreaseOverallCondition extends Condition {
     private static final String NAME = "Warning count increase: overall";
     private String percentage = String.valueOf(5.0f);
     private String warrantedResult = Result.UNSTABLE.toString();
+    private String resultDescription = NAME;
 
     @DataBoundConstructor
     public WarningCountIncreaseOverallCondition(String percentage) {
@@ -61,15 +62,24 @@ public class WarningCountIncreaseOverallCondition extends Condition {
             return Result.SUCCESS;
         }
 
-        float previousCount = (float) previous.getAnalysisActiveWarnings().getWarnings().size();
-        float currentCount = (float) current.getAnalysisActiveWarnings().getWarnings().size();
-        float diff = currentCount - previousCount;
+        int previousCount = previous.getAnalysisActiveWarnings().getWarnings().size();
+        int currentCount = current.getAnalysisActiveWarnings().getWarnings().size();
+        int diff = currentCount - previousCount;
+        float thresholdPercentage = Float.parseFloat(percentage);
+        float result = (((float) diff) / previousCount) * 100;
 
-        if ((diff / previousCount) * 100 > Float.parseFloat(percentage)) {
+        if (result > thresholdPercentage) {
+            resultDescription = String.format("More than %.2f%% increase in warnings (%.2f%%, %d out of %d)", thresholdPercentage, result, diff, previousCount);
             return Result.fromString(warrantedResult);
         }
 
+        resultDescription = String.format("At most %.2f%% increase in warnings (%.2f%%, %d out of %d)", thresholdPercentage, result, diff, previousCount);
         return Result.SUCCESS;
+    }
+
+    @Override
+    public String describeResult() {
+        return resultDescription;
     }
 
     @Symbol("warningCountIncreaseOverall")

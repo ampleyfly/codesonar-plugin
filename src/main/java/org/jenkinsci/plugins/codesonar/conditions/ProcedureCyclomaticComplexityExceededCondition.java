@@ -29,6 +29,7 @@ public class ProcedureCyclomaticComplexityExceededCondition extends Condition {
 
     private int maxCyclomaticComplexity = 30;
     private String warrantedResult = Result.UNSTABLE.toString();
+    private String resultDescription = NAME;
 
     @DataBoundConstructor
     public ProcedureCyclomaticComplexityExceededCondition(int maxCyclomaticComplexity) {
@@ -63,12 +64,19 @@ public class ProcedureCyclomaticComplexityExceededCondition extends Condition {
         for (ProcedureRow procedureRow : procedureRows) {
             Metric cyclomaticComplexityMetric = procedureRow.getMetricByName("Cyclomatic Complexity");
 
-            String value = cyclomaticComplexityMetric.getValue();
-            if (Integer.parseInt(value) > maxCyclomaticComplexity) {
+            int value = Integer.parseInt(cyclomaticComplexityMetric.getValue());
+            if (value > maxCyclomaticComplexity) {
+                resultDescription = String.format("Cyclomatic complexity %d of procedure %s exceeded limit %d", value, procedureRow.getProcedure(), maxCyclomaticComplexity);
                 return Result.fromString(warrantedResult);
             }
         }
+        resultDescription = String.format("Cyclomatic complexity is at most %d", maxCyclomaticComplexity);
         return Result.SUCCESS;
+    }
+
+    @Override
+    public String describeResult() {
+        return resultDescription;
     }
     
     @Symbol("cyclomaticComplexity")

@@ -31,6 +31,7 @@ public class WarningCountIncreaseSpecifiedScoreAndHigherCondition extends Condit
     private int rankOfWarnings = 30;
     private String warningPercentage = String.valueOf(5.0f);
     private String warrantedResult = Result.UNSTABLE.toString();
+    private String resultDescription = NAME;
 
     @DataBoundConstructor
     public WarningCountIncreaseSpecifiedScoreAndHigherCondition(int rankOfWarnings, String warningPercentage) {
@@ -82,12 +83,20 @@ public class WarningCountIncreaseSpecifiedScoreAndHigherCondition extends Condit
         }
 
         float calculatedWarningPercentage = (severeWarnings / totalNumberOfWarnings) * 100;
+        float thresholdPercentage = Float.parseFloat(warningPercentage);
 
-        if (calculatedWarningPercentage > Float.parseFloat(warningPercentage)) {
+        if (calculatedWarningPercentage > thresholdPercentage) {
+            resultDescription = String.format("More than %.2f%% warnings with score more than %d (%.2f%%, %d out of %d)", thresholdPercentage, rankOfWarnings, result, severeWarnings, totalNumberOfWarnings);
             return Result.fromString(warrantedResult);
         }
 
+        resultDescription = String.format("At most %.2f%% warnings with score more than %d (%.2f%%, %d out of %d)", thresholdPercentage, rankOfWarnings, result, severeWarnings, totalNumberOfWarnings);
         return Result.SUCCESS;
+    }
+
+    @Override
+    public String describeResult() {
+        return resultDescription;
     }
 
     @Symbol("warningCountIncreaseSpecifiedScoreAndHigher")

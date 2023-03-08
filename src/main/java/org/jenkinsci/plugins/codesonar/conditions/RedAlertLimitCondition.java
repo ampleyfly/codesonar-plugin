@@ -28,6 +28,7 @@ public class RedAlertLimitCondition extends Condition {
 
     private int alertLimit = 1;
     private String warrantedResult = Result.UNSTABLE.toString();
+    private String resultDescription = NAME;
 
     @DataBoundConstructor
     public RedAlertLimitCondition(int alertLimit) {
@@ -60,10 +61,17 @@ public class RedAlertLimitCondition extends Condition {
 
         List<Alert> redAlerts = current.getAnalysisActiveWarnings().getRedAlerts();
         if (redAlerts.size() > alertLimit) {
+            resultDescription = String.format("More than %d red alerts (%d)", alertLimit, redAlerts.size());
             return Result.fromString(warrantedResult);
         }
 
+        resultDescription = String.format("At most %d red alerts (%d)", alertLimit, redAlerts.size());
         return Result.SUCCESS;
+    }
+
+    @Override
+    public String describeResult() {
+        return resultDescription;
     }
 
     @Symbol("redAlerts")

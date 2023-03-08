@@ -27,6 +27,7 @@ public class YellowAlertLimitCondition extends Condition {
    
     private int alertLimit = 1;
     private String warrantedResult = Result.UNSTABLE.toString();
+    private String resultDescription = NAME;
 
     @DataBoundConstructor
     public YellowAlertLimitCondition(int alertLimit) {
@@ -59,10 +60,17 @@ public class YellowAlertLimitCondition extends Condition {
         
         List<Alert> yellowAlerts = current.getAnalysisActiveWarnings().getYellowAlerts();
         if (yellowAlerts.size() > alertLimit) {
+            resultDescription = String.format("More than %d yellow alerts (%d)", alertLimit, yellowAlerts.size());
             return Result.fromString(warrantedResult);
         }
 
+        resultDescription = String.format("At most %d yellow alerts (%d)", alertLimit, yellowAlerts.size());
         return Result.SUCCESS;
+    }
+
+    @Override
+    public String describeResult() {
+        return resultDescription;
     }
 
     @Symbol("yellowAlerts")
